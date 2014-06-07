@@ -1,19 +1,19 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.macroid.starter"
+    package="com.example.pingpong"
     android:versionCode="0"
     android:versionName="0.1">
 
     <uses-sdk
-        android:minSdkVersion="16"
-        android:targetSdkVersion="16"/>
+        android:minSdkVersion="11"
+        android:targetSdkVersion="18"/>
 
     <application
-        android:label="Macroid Starter"
+        android:label="Macroid Akka Ping-pong"
         android:icon="@drawable/android:star_big_on"
         android:theme="@android:style/Theme.Holo.Light">
 
         <activity
-          android:label="Macroid Starter"
+          android:label="Macroid Akka Ping-pong"
           android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

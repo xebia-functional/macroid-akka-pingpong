@@ -1,0 +1,143 @@
+﻿<html>
+<head>
+	<meta encoding="utf-8"/>
+	<title>macroid-akka-pingpong — Scala on Android with Macroid and Akka</title>
+</head>
+<body>
+	<div>
+		<h2>Prerequisites and installation</h2>
+		
+		<p>This template assumes that you have installed the Android SDK (and API 18) and have a basic understanding of Android programming (either in Java or Scala) and basic Scala knowledge.</p>
+		<p>In case you get stuck running the project or creating the IDE files, help can be found at Macroid’s <a href="http://macroid.github.io/ScalaOnAndroid.html">Scala on Android</a> page or the <a href="https://github.com/pfn/android-sdk-plugin">SBT Android plugin</a> page.</p>
+		
+		<h2>At a glance</h2>
+		
+		<p>We revive Android development with a few interesting concepts and techniques. First, we utilize <a href="http://macroid.github.io">Macroid</a> — a modular functional user interface DSL. Macroid is much more flexible than Android’s standard XML-based layout framework and makes it easy to program complex interactions in a declarative way. Second, we employ <a href="http://akka.io">Akka</a> actors to establish communication between different fragments of the user interface. Not only does this provide the lacking communication facilities, but it also helps to maintain proper threading and makes the interface “reactive”, which any large-scale application would benefit from.</p>
+		
+		<p>What does this application do? Not much. Two parts of the screen are playing invisible ping-pong with each other, and you — the user — have to click on the rackets that look like normal buttons. But did we mention the code was fancy?</p>
+		
+		<h2>Android, Macroid and Akka 101</h2>
+		
+		<h3>Android</h3>
+		
+		<p>The main units of Android programs are <code>Activiti</code>es, which correspond to application screens. You need to define activity’s visual layout (user interface) and behavior.</p>
+		
+		<p>Another important concept is that of a <code>Fragment</code> — a reusable piece of user interface and/or behavior. Several fragments could be nested inside the activity’s layout.<p>
+		
+		<p>Finally, classes such as <code>Button</code> or <code>TextView</code> are used to define the interfaces.</p>
+		
+		<p>You can learn more about Android programming at <a href="http://developer.android.com">http://developer.android.com</a>.</p>
+		
+		<h3>Macroid</h3>
+		
+		<p>The four main concepts of Macroid used in this template are as follows:
+		<ul>
+			<li>Bricks — composable pieces of layouts, for example: <code>w[Button]</code></li>
+			<li>Tweaks — composable modifiers of widget properties: <code>text("Foo") + show</code></li>
+			<li>Snails — composable animations: <code>delay(500) ++ fadeOut(400)</code></li>
+			<li>UI actions — composable chunks of UI code, that have to run on the UI thread (examples later)</li>
+		</ul></p>
+		
+		<p>You can learn more about Macroid at <a href="http://macroid.github.io">http://macroid.github.io</a>.</p>
+		
+		<h3>Akka</h3>
+		
+		<p>Akka is an actor framework, which means that it is based around share-nothing entities (actors) that communicate by passing messages to each other.</p>
+		
+		<p>The actor model is very robust and has been used in many high-performance reactive applications</p>
+		
+		<p>You can learn more about Akka at <a href="http://akka.io">http://akka.io</a>.</p>
+		
+		<h2>Code walkthrough</h2>
+		
+		<p>First, we define the build (<a href="#code/build.sbt" class="shortcut">build.sbt</a>), include the SBT Android plugin (<a href="#code/project/plugins.sbt" class="shortcut">project/plugins.sbt</a>) and Android manifest (<a href="#code/src/main/AndroidManifest.xml" class="shortcut">src/main/AndroidManifest.xml</a>).</p>
+		
+		<p>Next, we define our <code>MainActivity</code> (<a href="#code/src/main/scala/com/example/pingpong/MainActivity.scala" class="shortcut">MainActivity.scala</a>). Note the actor system initialization:
+		<pre><code>
+  // name of our actor system
+  val actorSystemName = "pingpong"
+
+  // players
+  lazy val ping = actorSystem.actorOf(RacketActor.props, "ping")
+  lazy val pong = actorSystem.actorOf(RacketActor.props, "pong")
+</code></pre>
+This introduces two actors, which will play with each other.</p>
+
+		<p>Now let’s take a look at the <code>RacketActor</code> class (<a href="#code/src/main/scala/com/example/pingpong/RacketActor.scala" class="shortcut">RacketActor.scala</a>). Its main part is the message handling:
+		<pre><code>
+  def receive = {
+    case Ball ⇒
+      // boast
+      log.debug("got the ball!")
+      // save the opponent reference
+      lastOpponent = Some(sender())
+      // notify the UI
+      withUi(f ⇒ f.receive)
+
+    case Smash ⇒
+      // boast
+      log.debug("smash!!!")
+      // send the ball to the opponent
+      lastOpponent.foreach(_ ! Ball)
+      // forget who it was
+      lastOpponent = None
+  }
+</code></pre>
+The actor can receive two types of messages. If it receives the ball, it notifies the UI so that a racket is shown. When the racket is pressed, the actor receives the <code>Smash</code> message, which makes it send the ball to its opponent.</p>
+
+<p>In our application each actor will be connected to a <code>Fragment</code> — a piece of user interface. The <code>withUi(f ⇒ f.receive)</code> line, which we saw above, obtains the attached fragment <code>f</code> and performs an UI action <code>receive</code> with it.</p>
+
+<p>It’s time to look at the code of the fragment (<a href="#code/src/main/scala/com/example/pingpong/RacketFragment.scala" class="shortcut">RacketFragment.scala</a>). The two fragments are actually identical, they are just attached to different actors. First, we declare some styles and effects for our rackets, like so:
+<pre><code>
+  object Styles {
+    // how racket looks
+    def racket(implicit appCtx: AppContext) =
+      hide + disable +
+      text("SMASH") +
+      TextSize.large +
+      lp[FrameLayout](WRAP_CONTENT, WRAP_CONTENT, Gravity.CENTER)
+  }
+</code></pre>
+This example really showcases the power of Macroid, as we can combine various properties together with ease and take advantage of Scala’s modular aspect to achieve the desired namespacing.<p>
+
+<p>Next, we teach our fragment how to connect to its actor:
+<pre><code>
+  // get actor name from arguments
+  lazy val actorName = getArguments.getString("name")
+
+  // actor for this fragment
+  def actor = Some(actorSystem.actorSelection(s"/user/$actorName"))
+</code></pre></p>
+
+<p>Finally, we add the visual layout:
+<pre><code>
+  l[FrameLayout](
+    w[Button] <~ wire(racket) <~ Styles.racket <~ On.click(smash)
+  )
+</code></pre> and define a couple of UI actions. The first one shows the racket and, as we remember, is triggered from within the actor:
+<pre><code>
+  def receive =
+    racket <~ Effects.appear
+</code></pre> The second one is triggered when the racket is clicked:
+<pre><code>
+  def smash =
+    // wait until the racket disappears
+    (racket <~~ Effects.disappear) ~~
+    // tell the actor to smash
+    Ui(actor.foreach(_ ! RacketActor.Smash))
+</code></pre> It sends a message to the actor, so that it can respond to its opponent. Note the use of double <code>~</code>s: in a very concise way we were able to say that the fade out (<code>Effects.disappear</code>) should take place, and only when it finishes the next action is taken. These asyncronous workflows are another remarkable feature of Macroid.</p>
+
+<p>To conclude our overview, we need to include the fragments in the activity. No problem!
+<pre><code>
+  val view = l[LinearLayout](
+    // we pass a name for the actor, and id+tag for the fragment
+    f[RacketFragment].pass("name" → "ping").framed(Id.ping, Tag.ping) <~ lps,
+    f[RacketFragment].pass("name" → "pong").framed(Id.pong, Tag.pong) <~ lps
+  ) <~ vertical
+</code></pre></p>
+
+<h2>Conclusions</h2>
+
+<p>We have built an Android application with a simple reactive and modular UI thanks to the great Scala ecosystem. Make sure you follow the links to the projects used here to learn more and take advantage of their best features!</p>
+	</div>
+</body>

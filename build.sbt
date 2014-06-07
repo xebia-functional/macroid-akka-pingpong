@@ -8,6 +8,7 @@ name := "macroid-akka-pingpong"
 
 scalaVersion := "2.11.1"
 
+// a shortcut
 run <<= run in Android
 
 resolvers ++= Seq(
@@ -15,6 +16,7 @@ resolvers ++= Seq(
   "jcenter" at "http://jcenter.bintray.com"
 )
 
+// add linter
 scalacOptions in (Compile, compile) ++= Seq(
   "-P:wartremover:cp:" + (dependencyClasspath in Compile).value
     .files.map(_.toURL.toString)
@@ -47,6 +49,7 @@ proguardOptions in Android ++= Seq(
   "-keep class akka.dispatch.UnboundedMessageQueueSemantics { *; }",
   "-keep class akka.dispatch.UnboundedDequeBasedMessageQueueSemantics { *; }",
   "-keep class akka.dispatch.DequeBasedMessageQueueSemantics { *; }",
+  "-keep class akka.dispatch.MultipleConsumerSemantics { *; }",
   "-keep class akka.actor.LocalActorRefProvider$Guardian { *; }",
   "-keep class akka.actor.LocalActorRefProvider$SystemGuardian { *; }",
   "-keep class akka.dispatch.UnboundedMailbox { *; }",
