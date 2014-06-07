@@ -44,13 +44,13 @@
 		
 		<p>Akka is an actor framework, which means that it is based around share-nothing entities (actors) that communicate by passing messages to each other.</p>
 		
-		<p>The actor model is very robust and has been used in many high-performance reactive applications</p>
+		<p>The actor model is very robust and has been used in many high-performance reactive applications.</p>
 		
 		<p>You can learn more about Akka at <a href="http://akka.io">http://akka.io</a>.</p>
 		
 		<h2>Code walkthrough</h2>
 		
-		<p>First, we define the build (<a href="#code/build.sbt" class="shortcut">build.sbt</a>), include the SBT Android plugin (<a href="#code/project/plugins.sbt" class="shortcut">project/plugins.sbt</a>) and Android manifest (<a href="#code/src/main/AndroidManifest.xml" class="shortcut">src/main/AndroidManifest.xml</a>).</p>
+		<p>First, we define the build (<a href="#code/build.sbt" class="shortcut">build.sbt</a>), include the SBT Android plugin (<a href="#code/project/plugins.sbt" class="shortcut">project/plugins.sbt</a>) and Android manifest (<a href="#code/src/main/AndroidManifest.xml" class="shortcut">src/main/AndroidManifest.xml</a>). We also add a basic Akka configuration (<a href="#code/src/main/AndroidManifest.xml" class="shortcut">src/main/resources/application.conf</a>).</p>
 		
 		<p>Next, we define our <code>MainActivity</code> (<a href="#code/src/main/scala/com/example/pingpong/MainActivity.scala" class="shortcut">MainActivity.scala</a>). Note the actor system initialization:
 		<pre><code>
@@ -65,12 +65,12 @@ This introduces two actors, which will play with each other.</p>
 
 		<p>Now let’s take a look at the <code>RacketActor</code> class (<a href="#code/src/main/scala/com/example/pingpong/RacketActor.scala" class="shortcut">RacketActor.scala</a>). Its main part is the message handling:
 		<pre><code>
-  def receive = {
+  def receive = receiveUi andThen {
     case Ball ⇒
       // boast
       log.debug("got the ball!")
       // save the opponent reference
-      lastOpponent = Some(sender())
+      lastOpponent = Some(sender)
       // notify the UI
       withUi(f ⇒ f.receive)
 
@@ -81,9 +81,19 @@ This introduces two actors, which will play with each other.</p>
       lastOpponent.foreach(_ ! Ball)
       // forget who it was
       lastOpponent = None
+	  
+	case AttachUi(_) ⇒
+      // if the ui is attached after
+      // receiveing the ball, update it
+      lastOpponent foreach { _ ⇒
+        withUi(f ⇒ f.receive)
+      }
+
+    case DetachUi ⇒
+      // do nothing
   }
 </code></pre>
-The actor can receive two types of messages. If it receives the ball, it notifies the UI so that a racket is shown. When the racket is pressed, the actor receives the <code>Smash</code> message, which makes it send the ball to its opponent.</p>
+The actor can receive two main types of messages. If it receives the ball, it notifies the UI so that a racket is shown. When the racket is pressed, the actor receives the <code>Smash</code> message, which makes it send the ball to its opponent. Additionally there are two messages that deal with connecting the actor to the user interface.</p>
 
 <p>In our application each actor will be connected to a <code>Fragment</code> — a piece of user interface. The <code>withUi(f ⇒ f.receive)</code> line, which we saw above, obtains the attached fragment <code>f</code> and performs an UI action <code>receive</code> with it.</p>
 
@@ -106,7 +116,7 @@ This example really showcases the power of Macroid, as we can combine various pr
   lazy val actorName = getArguments.getString("name")
 
   // actor for this fragment
-  def actor = Some(actorSystem.actorSelection(s"/user/$actorName"))
+  lazy val actor = Some(actorSystem.actorSelection(s"/user/$actorName"))
 </code></pre></p>
 
 <p>Finally, we add the visual layout:

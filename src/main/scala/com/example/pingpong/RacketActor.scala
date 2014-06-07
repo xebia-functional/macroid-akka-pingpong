@@ -17,10 +17,13 @@ object RacketActor {
 /** The actor that handles the ball */
 class RacketActor extends FragmentActor[RacketFragment] with ActorLogging {
   import RacketActor._
+  import FragmentActor._
 
   var lastOpponent: Option[ActorRef] = None
 
-  def receive = {
+  // receiveUi handles attaching and detaching UI
+  // and then (sic!) passes the message to us
+  def receive = receiveUi andThen {
     case Ball ⇒
       // boast
       log.debug("got the ball!")
@@ -36,5 +39,15 @@ class RacketActor extends FragmentActor[RacketFragment] with ActorLogging {
       lastOpponent.foreach(_ ! Ball)
       // forget who it was
       lastOpponent = None
+
+    case AttachUi(_) ⇒
+      // if the ui is attached after
+      // receiveing the ball, update it
+      lastOpponent foreach { _ ⇒
+        withUi(f ⇒ f.receive)
+      }
+
+    case DetachUi ⇒
+      // do nothing
   }
 }

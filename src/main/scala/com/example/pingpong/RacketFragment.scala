@@ -43,7 +43,7 @@ class RacketFragment extends AkkaFragment with Contexts[AkkaFragment] {
   lazy val actorName = getArguments.getString("name")
 
   // actor for this fragment
-  def actor = Some(actorSystem.actorSelection(s"/user/$actorName"))
+  lazy val actor = Some(actorSystem.actorSelection(s"/user/$actorName"))
 
   // a slot for the racket button
   var racket = slot[Button]

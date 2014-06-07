@@ -41,6 +41,7 @@ proguardOptions in Android ++= Seq(
 
 // ProGuard rules for Akka
 proguardOptions in Android ++= Seq(
+  "-keep class akka.actor.Actor$class { *; }",
   "-keep class akka.actor.LightArrayRevolverScheduler { *; }",
   "-keep class akka.actor.LocalActorRefProvider { *; }",
   "-keep class akka.actor.CreatorFunctionConsumer { *; }",

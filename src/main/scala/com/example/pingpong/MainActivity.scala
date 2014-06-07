@@ -22,6 +22,9 @@ class MainActivity extends FragmentActivity with Contexts[FragmentActivity] with
   override def onCreate(savedInstanceState: Bundle) = {
     super.onCreate(savedInstanceState)
 
+    // initialize the actors
+    (ping, pong)
+
     // layout params
     val lps = lp[LinearLayout](MATCH_PARENT, WRAP_CONTENT, 1.0f)
 
