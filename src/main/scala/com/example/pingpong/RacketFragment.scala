@@ -32,7 +32,7 @@ object Effects {
 
   // disappear with style
   def disappear =
-    disable +
+    disable ++
     fadeOut(600) ++
     delay(600)
 }

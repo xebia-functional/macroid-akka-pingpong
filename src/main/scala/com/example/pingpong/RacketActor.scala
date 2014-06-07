@@ -25,7 +25,7 @@ class RacketActor extends FragmentActor[RacketFragment] with ActorLogging {
       // boast
       log.debug("got the ball!")
       // save the opponent reference
-      lastOpponent = Some(sender())
+      lastOpponent = Some(sender)
       // notify the UI
       withUi(f ⇒ f.receive)
 
