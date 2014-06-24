@@ -6,7 +6,7 @@ platformTarget in Android := "android-18"
 
 name := "macroid-akka-pingpong"
 
-scalaVersion := "2.10.4"
+scalaVersion := "2.11.1"
 
 // a shortcut
 run <<= run in Android
@@ -27,7 +27,7 @@ scalacOptions in (Compile, compile) ++= Seq(
 libraryDependencies ++= Seq(
   "org.macroid" %% "macroid" % "2.0.0-M2",
   "org.macroid" %% "macroid-akka-fragments" % "2.0.0-M2",
-  "com.typesafe.akka" %% "akka-actor" % "2.2.4",
+  "com.typesafe.akka" %% "akka-actor" % "2.3.3",
   compilerPlugin("org.brianmckenna" %% "wartremover" % "0.10")
 )
 
