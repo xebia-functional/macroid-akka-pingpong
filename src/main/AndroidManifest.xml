@@ -4,8 +4,8 @@
     android:versionName="0.1">
 
     <uses-sdk
-        android:minSdkVersion="11"
-        android:targetSdkVersion="18"/>
+        android:minSdkVersion="9"
+        android:targetSdkVersion="19"/>
 
     <application
         android:label="Macroid Akka Ping-pong"
