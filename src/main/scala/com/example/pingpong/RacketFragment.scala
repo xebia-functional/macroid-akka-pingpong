@@ -7,8 +7,8 @@ import android.view.ViewGroup.LayoutParams._
 
 import macroid._
 import macroid.FullDsl._
-import macroid.contrib.ExtraTweaks._
-import macroid.util.Ui
+import macroid.contrib.TextTweaks
+import macroid.Ui
 import macroid.akkafragments.AkkaFragment
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -19,7 +19,7 @@ object Styles {
   def racket(implicit appCtx: AppContext) =
     hide + disable +
     text("SMASH") +
-    TextSize.large +
+    TextTweaks.large +
     lp[FrameLayout](WRAP_CONTENT, WRAP_CONTENT, Gravity.CENTER)
 }
 
