@@ -1,7 +1,7 @@
 package com.example.pingpong
 
 import akka.actor.{Props, ActorLogging, ActorRef}
-import macroid.akkafragments.FragmentActor
+import macroid.akka.FragmentActor
 
 object RacketActor {
   case object Ball
