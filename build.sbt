@@ -20,9 +20,9 @@ scalacOptions in (Compile, compile) ++=
   Seq("-P:wartremover:traverser:macroid.warts.CheckUi")
 
 libraryDependencies ++= Seq(
-  aar("org.macroid" %% "macroid" % "2.0.0-M3"),
-  "com.android.support" % "support-v4" % "21.0.0",
-  "org.macroid" %% "macroid-akka-fragments" % "2.0.0-M3",
+  aar("org.macroid" %% "macroid" % "2.0.0-M4"),
+  "com.android.support" % "support-v4" % "22.1.1",
+  "org.macroid" %% "macroid-akka" % "2.0.0-M4",
   "com.typesafe.akka" %% "akka-actor" % "2.3.6",
   compilerPlugin("org.brianmckenna" %% "wartremover" % "0.11")
 )
@@ -51,6 +51,6 @@ proguardOptions in Android ++= Seq(
   "-keep class akka.actor.LocalActorRefProvider$SystemGuardian { *; }",
   "-keep class akka.dispatch.UnboundedMailbox { *; }",
   "-keep class akka.actor.DefaultSupervisorStrategy { *; }",
-  "-keep class macroid.akkafragments.AkkaAndroidLogger { *; }",
+  "-keep class macroid.akka.AkkaAndroidLogger { *; }",
   "-keep class akka.event.Logging$LogExt { *; }"
 )

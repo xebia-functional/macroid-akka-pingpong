@@ -9,7 +9,7 @@ import macroid._
 import macroid.FullDsl._
 import macroid.contrib.TextTweaks
 import macroid.Ui
-import macroid.akkafragments.AkkaFragment
+import macroid.akka.AkkaFragment
 
 import scala.concurrent.ExecutionContext.Implicits.global
 

@@ -8,7 +8,7 @@ import android.support.v4.app.FragmentActivity
 // import macroid stuff
 import macroid._
 import macroid.FullDsl._
-import macroid.akkafragments.AkkaActivity
+import macroid.akka.AkkaActivity
 
 /** The main activity */
 class MainActivity extends FragmentActivity with Contexts[FragmentActivity] with IdGeneration with AkkaActivity {
