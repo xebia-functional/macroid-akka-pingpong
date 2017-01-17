@@ -1,9 +1,9 @@
-android.Plugin.androidBuild
-platformTarget in Android := "android-23"
+enablePlugins(AndroidApp)
+platformTarget in Android := "android-25"
 
 name := "macroid-akka-pingpong"
 
-scalaVersion := "2.11.4"
+scalaVersion := "2.11.8"
 javacOptions ++= Seq("-target", "1.7", "-source", "1.7") // so we can build with java8
 
 // a shortcut
@@ -14,17 +14,11 @@ resolvers ++= Seq(
   "jcenter" at "http://jcenter.bintray.com"
 )
 
-// add linter
-scalacOptions in (Compile, compile) ++=
-  (dependencyClasspath in Compile).value.files.map("-P:wartremover:cp:" + _.toURI.toURL) ++
-  Seq("-P:wartremover:traverser:macroid.warts.CheckUi")
-
 libraryDependencies ++= Seq(
-  aar("org.macroid" %% "macroid" % "2.0.0-M4"),
-  "com.android.support" % "support-v4" % "22.1.1",
-  "org.macroid" %% "macroid-akka" % "2.0.0-M4",
-  "com.typesafe.akka" %% "akka-actor" % "2.3.6",
-  compilerPlugin("org.brianmckenna" %% "wartremover" % "0.11")
+  aar("org.macroid" %% "macroid" % "2.0"),
+  "com.android.support" % "support-v4" % "25.1.0",
+  "org.macroid" %% "macroid-akka" % "2.0",
+  "com.typesafe.akka" %% "akka-actor" % "2.3.16"
 )
 
 proguardScala in Android := true

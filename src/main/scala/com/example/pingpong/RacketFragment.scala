@@ -16,7 +16,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 /** Styles for our widgets */
 object Styles {
   // how racket looks
-  def racket(implicit appCtx: AppContext) =
+  def racket(implicit appCtx: ContextWrapper) =
     hide + disable +
     text("SMASH") +
     TextTweaks.large +
@@ -59,7 +59,7 @@ class RacketFragment extends AkkaFragment with Contexts[AkkaFragment] {
     // tell the actor to smash
     Ui(actor.foreach(_ ! RacketActor.Smash))
 
-  override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle) = getUi {
+  override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle) = Ui.get {
     l[FrameLayout](
       w[Button] <~ wire(racket) <~ Styles.racket <~ On.click(smash)
     )
