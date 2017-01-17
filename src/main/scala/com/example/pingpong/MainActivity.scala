@@ -10,8 +10,10 @@ import macroid._
 import macroid.FullDsl._
 import macroid.akka.AkkaActivity
 
+object Id extends IdGenerator(start = 1000)
+
 /** The main activity */
-class MainActivity extends FragmentActivity with Contexts[FragmentActivity] with IdGeneration with AkkaActivity {
+class MainActivity extends FragmentActivity with Contexts[FragmentActivity] with AkkaActivity {
   // name of our actor system
   val actorSystemName = "pingpong"
 
@@ -31,11 +33,11 @@ class MainActivity extends FragmentActivity with Contexts[FragmentActivity] with
     // include the two fragments
     val view = l[LinearLayout](
       // we pass a name for the actor, and id+tag for the fragment
-      f[RacketFragment].pass("name" → "ping").framed(Id.ping, Tag.ping) <~ lps,
-      f[RacketFragment].pass("name" → "pong").framed(Id.pong, Tag.pong) <~ lps
+      f[RacketFragment].pass(Bundles.bundle("name" -> "ping")).framed(Id.ping, Tag.ping) <~ lps,
+      f[RacketFragment].pass(Bundles.bundle("name" -> "pong")).framed(Id.pong, Tag.pong) <~ lps
     ) <~ vertical
 
-    setContentView(getUi(view))
+    setContentView(Ui.get(view))
   }
 
   override def onStart() = {
